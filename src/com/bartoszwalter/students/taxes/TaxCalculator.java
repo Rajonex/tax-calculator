@@ -5,120 +5,133 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 
 public class TaxCalculator {
-	
-	public static double podstawa = 0;
-	public static char umowa = ' ';
+
+	public static double wage = 0; //pensja
+	public static char employmentContract = ' '; //rodzaj umowy
 	// składki na ubezpieczenia społeczne
-	public static double s_emerytalna = 0; // 9,76% podstawyy
-	public static double s_rentowa = 0; // 1,5% podstawy
-	public static double u_chorobowe = 0; // 2,45% podstawy
+	public static double retirementPayment = 0; //składka emerytalna (9,76% pensji)
+	public static double rentPayment = 0; // składka rentowa (1,5% pensji)
+	public static double healthInsurance = 0; // ubezpieczenie zdrowotne (2,45% pensji)
 	// składki na ubezpieczenia zdrowotne
-	public static double kosztyUzyskania = 111.25;
-	public static double s_zdrow1 = 0; // od podstawy wymiaru 9%
-	public static double s_zdrow2 = 0; // od podstawy wymiaru 7,75 %
-	public static double zaliczkaNaPod = 0; // zaliczka na podatek dochodowy 18%
-	public static double kwotaZmiejsz = 46.33; // kwota zmienjszająca podatek 46,33 PLN
-	public static double zaliczkaUS = 0;
-	public static double zaliczkaUS0 = 0;
+	public static double costsOfObtaining = 111.25; //koszty uzyskania
+	public static double healthContribution9per = 0; // składka zdrowotna od pensji wymiaru 9%
+	public static double healthContribution7per = 0; // składka zdrowotna od pensji wymiaru 7,75%
+	public static double taxPrepayment = 0; // zaliczka na podatek dochodowy 18%
+	public static double taxReducingAmount = 46.33; // kwota zmienjszająca podatek 46,33 PLN
+	public static double advancedPaymentTaxOffice = 0; //zaliczka do urzędu skarbowego
+	public static double advancedPaymentTaxOfficeRounded = 0; //zaliczka do urzędu skarbowego po zaokrągleniu
 
 	public static void main(String[] args) {
 		try {
 			InputStreamReader isr = new InputStreamReader(System.in);
 			BufferedReader br = new BufferedReader(isr);
-			
-			System.out.print("Podaj kwotę dochodu: ");	
-			podstawa = Double.parseDouble(br.readLine());
-			
+
+			System.out.print("Podaj kwotę dochodu: ");
+			wage = Double.parseDouble(br.readLine());
+
 			System.out.print("Typ umowy: (P)raca, (Z)lecenie: ");
-			umowa = br.readLine().charAt(0);
-			
+			employmentContract = br.readLine().charAt(0);
+
 		} catch (Exception ex) { // TODO obsluga roznych exception lub zamiana BufferedReader  na Scanner
 			System.out.println("Błędna kwota");
 			System.err.println(ex);
 			return;
 		}
-		
+
 		DecimalFormat df00 = new DecimalFormat("#.00");
 		DecimalFormat df = new DecimalFormat("#");
-		
-		if (umowa == 'P') {
+
+		if (employmentContract == 'P') {
 			System.out.println("UMOWA O PRACĘ");
-			System.out.println("Podstawa wymiaru składek " + podstawa);
-			double oPodstawa = obliczonaPodstawa(podstawa);
-			System.out.println("Składka na ubezpieczenie emerytalne "
-					+ df00.format(s_emerytalna));
-			System.out.println("Składka na ubezpieczenie rentowe    "
-					+ df00.format(s_rentowa));
-			System.out.println("Składka na ubezpieczenie chorobowe  "
-					+ df00.format(u_chorobowe));
-			System.out
-					.println("Podstawa wymiaru składki na ubezpieczenie zdrowotne: "
-							+ oPodstawa);
-			obliczUbezpieczenia(oPodstawa);
-			System.out.println("Składka na ubezpieczenie zdrowotne: 9% = "
-					+ df00.format(s_zdrow1) + " 7,75% = " + df00.format(s_zdrow2));
-			System.out.println("Koszty uzyskania przychodu w stałej wysokości "
-					+ kosztyUzyskania);
-			double podstawaOpodat = oPodstawa - kosztyUzyskania;
-			double podstawaOpodat0 = Double
-					.parseDouble(df.format(podstawaOpodat));
-			System.out.println("Podstawa opodatkowania " + podstawaOpodat
-					+ " zaokrąglona " + df.format(podstawaOpodat0));
-			obliczPodatek(podstawaOpodat0);
-			System.out.println("Zaliczka na podatek dochodowy 18 % = "
-					+ zaliczkaNaPod);
-			System.out.println("Kwota wolna od podatku = " + kwotaZmiejsz);
-			double podatekPotracony = zaliczkaNaPod - kwotaZmiejsz;
-			System.out.println("Podatek potrącony = "
-					+ df00.format(podatekPotracony));
-			obliczZaliczke();
-			zaliczkaUS0 = Double.parseDouble(df.format(zaliczkaUS));
+			System.out.println("Podstawa wymiaru składek " + wage);
+
+			double healthInsuranceNetto = obliczonaPodstawa(wage);
+
+			System.out.println("Składka na ubezpieczenie emerytalne " + df00.format(retirementPayment));
+			System.out.println("Składka na ubezpieczenie rentowe    " + df00.format(rentPayment));
+			System.out.println("Składka na ubezpieczenie chorobowe  " + df00.format(healthInsurance));
+			System.out.println("Podstawa wymiaru składki na ubezpieczenie zdrowotne: " + healthInsuranceNetto);
+
+			calculateInsurance(healthInsuranceNetto);
+
+			System.out.println("Składka na ubezpieczenie zdrowotne: 9% = " + df00.format(healthContribution9per) + " 7,75% = " + df00.format(healthContribution7per));
+			System.out.println("Koszty uzyskania przychodu w stałej wysokości " + costsOfObtaining);
+
+			double taxedWage = healthInsuranceNetto - costsOfObtaining; //pensja opodatkowana
+			double taxedWageRounded = Double.parseDouble(df.format(taxedWage)); //pensja opodatkowana zaokrąglona
+
+			System.out.println("Podstawa opodatkowania " + taxedWage + " zaokrąglona " + df.format(taxedWageRounded));
+
+
+			calculateTax(taxedWageRounded);
+
+
+			System.out.println("Zaliczka na podatek dochodowy 18 % = " + taxPrepayment);
+			System.out.println("Kwota wolna od podatku = " + taxReducingAmount);
+
+			double fullTax = taxPrepayment - taxReducingAmount;
+
+			System.out.println("Podatek potrącony = " + df00.format(fullTax));
+
+
+			calculateAdvancePayment();
+
+
+			advancedPaymentTaxOfficeRounded = Double.parseDouble(df.format(advancedPaymentTaxOffice));
 			System.out.println("Zaliczka do urzędu skarbowego = "
-					+ df00.format(zaliczkaUS) + " po zaokrągleniu = "
-					+ df.format(zaliczkaUS0));
-			double wynagrodzenie = podstawa
-					- ((s_emerytalna + s_rentowa + u_chorobowe) + s_zdrow1 + zaliczkaUS0);
+					+ df00.format(advancedPaymentTaxOffice) + " po zaokrągleniu = "
+					+ df.format(advancedPaymentTaxOfficeRounded));
+
+			double wageNetto = wage - ((retirementPayment + rentPayment + healthInsurance) + healthContribution9per + advancedPaymentTaxOfficeRounded);
+
 			System.out.println();
 			System.out
-					.println("Pracownik otrzyma wynagrodzenie netto w wysokości = "
-							+ df00.format(wynagrodzenie));
-		} else if (umowa == 'Z') {
+					.println("Pracownik otrzyma wynagrodzenie netto w wysokości = " + df00.format(wageNetto));
+
+		} else if (employmentContract == 'Z') {
 			System.out.println("UMOWA-ZLECENIE");
-			System.out.println("Podstawa wymiaru składek " + podstawa);
-			double oPodstawa = obliczonaPodstawa(podstawa);
-			System.out.println("Składka na ubezpieczenie emerytalne "
-					+ df00.format(s_emerytalna));
-			System.out.println("Składka na ubezpieczenie rentowe    "
-					+ df00.format(s_rentowa));
-			System.out.println("Składka na ubezpieczenie chorobowe  "
-					+ df00.format(u_chorobowe));
-			System.out
-					.println("Podstawa wymiaru składki na ubezpieczenie zdrowotne: "
-							+ oPodstawa);
-			obliczUbezpieczenia(oPodstawa);
-			System.out.println("Składka na ubezpieczenie zdrowotne: 9% = "
-					+ df00.format(s_zdrow1) + " 7,75% = " + df00.format(s_zdrow2));
-			kwotaZmiejsz = 0;
-			kosztyUzyskania = (oPodstawa * 20) / 100;
-			System.out.println("Koszty uzyskania przychodu (stałe) "
-					+ kosztyUzyskania);
-			double podstawaOpodat = oPodstawa - kosztyUzyskania;
+			System.out.println("Podstawa wymiaru składek " + wage);
+
+			double healthInsuranceNetto = obliczonaPodstawa(wage);
+
+			System.out.println("Składka na ubezpieczenie emerytalne " + df00.format(retirementPayment));
+			System.out.println("Składka na ubezpieczenie rentowe    " + df00.format(rentPayment));
+			System.out.println("Składka na ubezpieczenie chorobowe  " + df00.format(healthInsurance));
+			System.out.println("Podstawa wymiaru składki na ubezpieczenie zdrowotne: " + healthInsuranceNetto);
+			calculateInsurance(healthInsuranceNetto);
+			System.out.println("Składka na ubezpieczenie zdrowotne: 9% = " + df00.format(healthContribution9per) + " 7,75% = " + df00.format(healthContribution7per));
+			taxReducingAmount = 0;
+			costsOfObtaining = (healthInsuranceNetto * 20) / 100;
+			System.out.println("Koszty uzyskania przychodu (stałe) " + costsOfObtaining);
+
+			double podstawaOpodat = healthInsuranceNetto - costsOfObtaining;
 			double podstawaOpodat0 = Double.parseDouble(df.format(podstawaOpodat));
-			System.out.println("Podstawa opodatkowania " + podstawaOpodat
-					+ " zaokrąglona " + df.format(podstawaOpodat0));
-			obliczPodatek(podstawaOpodat0);
+
+			System.out.println("Podstawa opodatkowania " + podstawaOpodat + " zaokrąglona " + df.format(podstawaOpodat0));
+
+			calculateTax(podstawaOpodat0);
+
+
 			System.out.println("Zaliczka na podatek dochodowy 18 % = "
-					+ zaliczkaNaPod);
-			double podatekPotracony = zaliczkaNaPod;
+					+ taxPrepayment);
+
+			double podatekPotracony = taxPrepayment;
+
 			System.out.println("Podatek potrącony = "
 					+ df00.format(podatekPotracony));
-			obliczZaliczke();
-			zaliczkaUS0 = Double.parseDouble(df.format(zaliczkaUS));
+
+
+			calculateAdvancePayment();
+
+
+			advancedPaymentTaxOfficeRounded = Double.parseDouble(df.format(advancedPaymentTaxOffice));
 			System.out.println("Zaliczka do urzędu skarbowego = "
-					+ df00.format(zaliczkaUS) + " po zaokrągleniu = "
-					+ df.format(zaliczkaUS0));
-			double wynagrodzenie = podstawa
-					- ((s_emerytalna + s_rentowa + u_chorobowe) + s_zdrow1 + zaliczkaUS0);
+					+ df00.format(advancedPaymentTaxOffice) + " po zaokrągleniu = "
+					+ df.format(advancedPaymentTaxOfficeRounded));
+
+			double wynagrodzenie = wage
+					- ((retirementPayment + rentPayment + healthInsurance) + healthContribution9per + advancedPaymentTaxOfficeRounded);
+
 			System.out.println();
 			System.out
 					.println("Pracownik otrzyma wynagrodzenie netto w wysokości = "
@@ -128,23 +141,23 @@ public class TaxCalculator {
 		}
 	}
 
-	public static void obliczZaliczke() {
-		zaliczkaUS = zaliczkaNaPod - s_zdrow2 - kwotaZmiejsz;
+	public static void calculateAdvancePayment() {
+		advancedPaymentTaxOffice = taxPrepayment - healthContribution7per - taxReducingAmount;
 	}
 
-	public static void obliczPodatek(double podstawa) {
-		zaliczkaNaPod = (podstawa * 18) / 100;
+	public static void calculateTax(double podstawa) {
+		taxPrepayment = (podstawa * 18) / 100;
 	}
 
 	public static double obliczonaPodstawa(double podstawa) { // TODO zamiast nadpisywac wartosci globalne zwracac obiekt z tymi wartosciami
-		s_emerytalna = (podstawa * 9.76) / 100;
-		s_rentowa = (podstawa * 1.5) / 100;
-		u_chorobowe = (podstawa * 2.45) / 100;
-		return (podstawa - s_emerytalna - s_rentowa - u_chorobowe);
+		retirementPayment = (podstawa * 9.76) / 100;
+		rentPayment = (podstawa * 1.5) / 100;
+		healthInsurance = (podstawa * 2.45) / 100;
+		return (podstawa - retirementPayment - rentPayment - healthInsurance);
 	}
 
-	public static void obliczUbezpieczenia(double podstawa) {
-		s_zdrow1 = (podstawa * 9) / 100;
-		s_zdrow2 = (podstawa * 7.75) / 100;
+	public static void calculateInsurance(double podstawa) {
+		healthContribution9per = (podstawa * 9) / 100;
+		healthContribution7per = (podstawa * 7.75) / 100;
 	}
 }
