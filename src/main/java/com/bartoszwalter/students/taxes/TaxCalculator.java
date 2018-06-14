@@ -37,84 +37,28 @@ public class TaxCalculator
         }
 
 
-        if (employmentContract == 'P')
+
+
+        try
         {
+            Contract contract = ContractFactory.createContract(employmentContract);
 
+            Map<String, DescriptionAmount> calculatedValuesAndDescriptions = contract.calculate(salary);
 
-            /******************************************************************************
-             *
-             * ROZWIAZANIE PO REFAKTORYZACJI
-             *
-             */
-
-            System.out.println();
-            System.out.println("*********************************************************************");
-            System.out.println();
-
-            try
+            System.out.println(contract.getHeader());
+            for (Map.Entry<String, DescriptionAmount> valueAndDescription : calculatedValuesAndDescriptions.entrySet())
             {
-                Contract contract = ContractFactory.createContract(employmentContract);
-
-                Map<String, DescriptionAmount> calculatedValuesAndDescriptions = contract.calculate(salary);
-
-                System.out.println(contract.getHeader());
-                for (Map.Entry<String, DescriptionAmount> valueAndDescription : calculatedValuesAndDescriptions.entrySet())
-                {
-                    System.out.println(valueAndDescription.getValue().getDescription() + valueAndDescription.getValue().getFormattedAmount());
-                }
-
-
-            } catch (IllegalArgumentException er)
-            {
-                System.out.println("Nieznany typ umowy!");
+                System.out.println(valueAndDescription.getValue().getDescription() + valueAndDescription.getValue().getFormattedAmount());
             }
 
 
-            /***************************************
-             *
-             * KONIEC
-             *
-             */
-        } else if (employmentContract == 'Z')
-        {
-
-
-            /******************************************************************************
-             *
-             * ROZWIAZANIE PO REFAKTORYZACJI
-             *
-             */
-
-            System.out.println();
-            System.out.println("*********************************************************************");
-            System.out.println();
-
-            try
-            {
-                Contract contract = ContractFactory.createContract(employmentContract); //zwraca nowy ContractOfMandate
-
-                Map<String, DescriptionAmount> calculatedValuesAndDescriptions = contract.calculate(salary);
-                //mapa ktora ma w sobie obliczone wartosci
-
-                System.out.println(contract.getHeader());
-                //dla kazdej wartosci w mapie
-                for (Map.Entry<String, DescriptionAmount> valueAndDescription : calculatedValuesAndDescriptions.entrySet())
-                {
-                    //wyswietl opis i kwote
-                    System.out.println(valueAndDescription.getValue().getDescription() + valueAndDescription.getValue().getFormattedAmount());
-                }
-
-
-            } catch (IllegalArgumentException er)
-            {
-                System.out.println("Nieznany typ umowy!");
-            }
-
-
-        } else
+        } catch (IllegalArgumentException er)
         {
             System.out.println("Nieznany typ umowy!");
         }
+
+
+
     }
 
 
