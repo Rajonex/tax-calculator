@@ -12,7 +12,7 @@ public class ContractFactory {
         {
             return new ContractOfEmployment(111.25, 46.33);
         } else if(contractCode == 'Z'){
-            return new ContractOfMandate();
+            return new ContractOfMandate(0.0);
         } else
         {
             throw new IllegalArgumentException("Podano nieprawidłowy identyfikator umowy.");
